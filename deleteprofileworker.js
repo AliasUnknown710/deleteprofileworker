@@ -73,10 +73,16 @@ export async function handleRequest(request, env) {
             { status: 500 }
         );
     }
-    return new Response(
-        `User profile ${user_id} deleted`,
-        { status: 200 }
-    );
+
+    // Clear auth cookie (if using cookies) and redirect
+    return new Response(null, {
+        status: 303,
+        headers: {
+            'Location': '/', // Main landing page
+            // Uncomment and adjust the line below if you use cookies for auth
+            // 'Set-Cookie': 'auth=; HttpOnly; Path=/; Max-Age=0; Secure; SameSite=Strict'
+        }
+    });
 }
 
 export async function main(request, env) {
