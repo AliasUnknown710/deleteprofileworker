@@ -1,0 +1,43 @@
+{
+  "name": "delete-profile-worker",
+  "version": "1.0.0",
+  "description": "A secure Cloudflare Worker for handling user profile deletion with authentication and backend integration",
+  "main": "deleteprofileworker.js",
+  "type": "module",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "tail": "wrangler tail",
+    "setup": "cp wrangler.toml.example wrangler.toml && echo 'Please edit wrangler.toml and set your backend URL with: wrangler secret put BACKEND_URL'",
+    "test": "echo 'Open test.html in browser to test worker functionality'",
+    "validate": "echo 'Run security validation tests'",
+    "docs": "echo 'Generate API documentation'"
+  },
+  "keywords": [
+    "cloudflare",
+    "worker",
+    "user-management",
+    "profile-deletion",
+    "authentication",
+    "security",
+    "backend-integration"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/username/user-management-workers.git",
+    "directory": "DeleteProfileWorker"
+  },
+  "bugs": {
+    "url": "https://github.com/username/user-management-workers/issues"
+  },
+  "homepage": "https://github.com/username/user-management-workers/tree/main/DeleteProfileWorker#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241218.0",
+    "wrangler": "^3.0.0"
+  }
+}
