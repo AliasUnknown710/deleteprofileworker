@@ -1,0 +1,47 @@
+name = "deleteprofileworker"
+main = "index.js"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Account and zone configuration
+# Replace with your actual Cloudflare account ID
+account_id = "your-account-id-here"
+
+# Environment configuration
+[env.production]
+name = "deleteprofileworker-prod"
+# routes = [
+#   { pattern = "yourdomain.com/delete-profile", zone_name = "yourdomain.com" }
+# ]
+
+[env.staging]
+name = "deleteprofileworker-staging"
+
+# Environment variables (secrets should be set via CLI)
+# Use: wrangler secret put BACKEND_DELETE_URL
+[vars]
+# ENVIRONMENT = "production"
+
+# Optional: Configure custom domains
+# [env.production.routes]
+# pattern = "api.yourdomain.com/delete-profile"
+# zone_name = "yourdomain.com"
+
+# Optional: KV namespaces for caching/logging
+# [[kv_namespaces]]
+# binding = "CACHE"
+# id = "your-kv-namespace-id"
+# preview_id = "your-preview-kv-namespace-id"
+
+# Optional: Durable Objects for session management
+# [[migrations]]
+# tag = "v1"
+# new_classes = ["SessionManager"]
+
+# [[durable_objects.bindings]]
+# name = "SESSION_MANAGER"
+# class_name = "SessionManager"
+
+# Resource limits
+[limits]
+cpu_ms = 10000

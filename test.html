@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Profile Worker - Test Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 600;
+        }
+        
+        input[type="text"], input[type="url"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        input[type="text"]:focus, input[type="url"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        button {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+        
+        .btn-test {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-test:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .response-area {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .response-area h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .response-content {
+            background: #fff;
+            padding: 1rem;
+            border-radius: 4px;
+            border: 1px solid #e1e5e9;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .warning strong {
+            color: #d63031;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗑️ Delete Profile Worker Test</h1>
+        
+        <div class="warning">
+            <strong>⚠️ Warning:</strong> This will attempt to delete a user profile. Only use with test data or ensure you have proper authorization.
+        </div>
+        
+        <form id="deleteForm">
+            <div class="form-group">
+                <label for="workerUrl">Worker URL:</label>
+                <input type="url" id="workerUrl" placeholder="http://localhost:8787" value="http://localhost:8787" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="userId">User ID:</label>
+                <input type="text" id="userId" placeholder="user123" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="authToken">Authorization Token:</label>
+                <input type="text" id="authToken" placeholder="your-auth-token-here" required>
+            </div>
+            
+            <div class="btn-group">
+                <button type="button" class="btn-test" onclick="testConnection()">Test Connection</button>
+                <button type="submit" class="btn-delete">Delete Profile</button>
+            </div>
+        </form>
+        
+        <div class="response-area" id="responseArea" style="display: none;">
+            <h3>Response:</h3>
+            <div class="response-content" id="responseContent"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('deleteForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            await makeDeleteRequest();
+        });
+
+        async function testConnection() {
+            const workerUrl = document.getElementById('workerUrl').value;
+            const authToken = document.getElementById('authToken').value;
+            
+            showResponse('Testing connection...', 'info');
+            
+            try {
+                // Test with a GET request to see if worker responds with 405 Method Not Allowed
+                const response = await fetch(workerUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.status === 405) {
+                    showResponse('✅ Connection successful! Worker is responding (405 Method Not Allowed for GET is expected)', 'success');
+                } else {
+                    const text = await response.text();
+                    showResponse(`⚠️ Unexpected response: ${response.status} ${response.statusText}\n${text}`, 'warning');
+                }
+            } catch (error) {
+                showResponse(`❌ Connection failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function makeDeleteRequest() {
+            const workerUrl = document.getElementById('workerUrl').value;
+            const userId = document.getElementById('userId').value;
+            const authToken = document.getElementById('authToken').value;
+            
+            if (!workerUrl || !userId || !authToken) {
+                showResponse('❌ Please fill in all fields', 'error');
+                return;
+            }
+            
+            showResponse('Sending delete request...', 'info');
+            
+            try {
+                const url = new URL(workerUrl);
+                url.searchParams.set('user_id', userId);
+                
+                const response = await fetch(url.toString(), {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const responseText = await response.text();
+                
+                let statusIcon = '';
+                if (response.status >= 200 && response.status < 300) {
+                    statusIcon = '✅';
+                } else if (response.status >= 400 && response.status < 500) {
+                    statusIcon = '⚠️';
+                } else {
+                    statusIcon = '❌';
+                }
+                
+                const responseInfo = `${statusIcon} Status: ${response.status} ${response.statusText}\n\n`;
+                const headers = Array.from(response.headers.entries())
+                    .map(([key, value]) => `${key}: ${value}`)
+                    .join('\n');
+                
+                const fullResponse = `${responseInfo}Headers:\n${headers}\n\nBody:\n${responseText}`;
+                
+                showResponse(fullResponse, response.ok ? 'success' : 'error');
+                
+                // If it's a redirect, show the location
+                if (response.status === 303 && response.headers.get('location')) {
+                    const location = response.headers.get('location');
+                    showResponse(`\n\n🔄 Redirect to: ${location}`, 'info', true);
+                }
+                
+            } catch (error) {
+                showResponse(`❌ Request failed: ${error.message}`, 'error');
+            }
+        }
+
+        function showResponse(text, type = 'info', append = false) {
+            const responseArea = document.getElementById('responseArea');
+            const responseContent = document.getElementById('responseContent');
+            
+            if (append) {
+                responseContent.textContent += text;
+            } else {
+                responseContent.textContent = text;
+            }
+            
+            responseArea.style.display = 'block';
+            
+            // Scroll to response
+            responseArea.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
