@@ -16,7 +16,7 @@ If you discover a security vulnerability, please follow these guidelines:
 
 **Do NOT create a public issue for security vulnerabilities.**
 
-Instead, please report security issues by emailing: **security@yourproject.com**
+Instead, please report security issues by emailing: admin@responder.infosecbyalex.com
 
 ### What to Include
 
